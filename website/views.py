@@ -1,27 +1,27 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from .forms import SignUpForm
+from .models import Record
 
 def home(request):
-	#Check to see if Logging in
-	if request.method == 'POST':
-		username = request.POST['username']
-		password = request.POST['password']
-		#authenticate users
-		user = authenticate(request, username=username, password=password)
-		if user is not None:
-			login(request, user)
-			messages.success(request, "You have successfully Logged In!")
-			return redirect('home')
+    # Grab all records in the Records Table
+    records = Record.objects.all()
 
-		else:
-			messages.success(request, "Error Logging in,Please try again!")
+    # Check to see if Logging in
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            messages.success(request, "You have successfully Logged In!")
+            return redirect('home')
+        else:
+            messages.success(request, "Error Logging in, Please try again!")
+            return redirect('home')
 
-	else:
-		return render(request, 'home.html', {})
-
-	return render(request, 'home.html', {})
-
+    return render(request, 'home.html', {'records': records})
 
 def logout_user(request):
     logout(request)
@@ -29,5 +29,20 @@ def logout_user(request):
     return redirect('home')
 
 def register_user(request):
-	return render(request, 'register.html', {})
-   
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            # Authenticate and login
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password1']
+            user = authenticate(username=username, password=password)
+            login(request, user)
+            messages.success(request, "You have successfully registered!")
+            return redirect('home')
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = SignUpForm()
+
+    return render(request, 'register.html', {'form': form})
