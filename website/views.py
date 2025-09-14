@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from .forms import SignUpForm, AddRecordForm
+from django.http import JsonResponse
 from .models import Record
 
 def home(request):
@@ -57,6 +59,16 @@ def customer_record(request, pk):
 		messages.success(request, "You Must Be Logged In To View That Page..")
 		return redirect('home')
 
+
+
+def delete_records(request):
+    if request.method == "POST":
+        ids = request.POST.getlist('ids[]')
+        Record.objects.filter(id__in=ids).delete()
+        return JsonResponse({"message": "Selected records deleted successfully."})
+    return JsonResponse({"message": "Invalid request"}, status=400)
+
+
 def delete_record(request, pk):
 	if request.user.is_authenticated:
 		delete_it = Record.objects.get(id=pk)
@@ -80,6 +92,12 @@ def add_record(request):
 	else:
 		messages.success(request, "You must be logged in...")
 		return redirect('home')
+
+
+def clean(self):
+    if self.marital_status == "Single" and self.fullname_spouse not in [None, "", "N/A"]:
+        raise ValidationError("A single person cannot have a spouse name.")
+
 
 def update_record(request, pk):
 	if request.user.is_authenticated:

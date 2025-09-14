@@ -2,46 +2,67 @@
 
 {% block content %}
 
-<!--div class="col-md-6 offset-md-3"-->
+{% if user.is_authenticated %}
+  <h1>Records</h1>
+  <button id="deleteSelected" class="btn btn-danger mb-3">Delete Selected</button>
 
-  {% if user.is_authenticated %}
-    <h1>Records</h1>
-
-    <table class="table table-striped table-hover table-bordered table-sm">
-  <thead class="table-dark">
-    <tr>
-      <th scope="col">Name</th>
-      <th scope="col">Email</th>
-      <th scope="col">Phone</th>
-      <th scope="col">Address</th>
-      <th scope="col">City</th>
-      <th scope="col">State</th>
-      <th scope="col">Created At</th>
-      <th scope="col">ID</th>
-    </tr>
-  </thead>
-  <tbody>
-
+  <table id="recordsTable" class="table table-striped table-hover table-bordered table-sm ">
+    <thead class="table-dark">
+      <tr>
+        <th><input type="checkbox" id="selectAll"></th>
+        <th>Name</th>
+        <th>Gender</th>
+        <th>National_ID</th>
+        <th>Marital_Status</th>
+        <th>Fullname_Spouse</th>
+        <th>Email</th>
+        <th>DOB</th>
+        <th>Phone_main</th>
+        <th>Phone_optional</th>
+        <th>Address</th>
+        <th>Province</th>
+        <!--th>Creation_Date</th-->
+        <th>ID</th>
+      </tr>
+    </thead>
+   <tbody>
   {% if records %}
-      {% for record in records %}
+    {% for record in records %}
     <tr>
-        <td><a href="{% url 'record' record.id %}">{{ record.first_name }} {{ record.last_name }}</a></td>
-        <td>{{ record.email }}</td>
-        <td>{{ record.phone }}</td>
-        <td>{{ record.address }}</td>
-        <td>{{ record.city }}</td>
-        <td>{{ record.state }}</td>
-        <td>{{ record.created_at }}</td>
-        <td><a href="{% url 'record' record.id %}">{{ record.id }}</a></td>  
+      <!-- First column: only checkbox -->
+      <td>
+        <input type="checkbox" class="record-checkbox" value="{{ record.id }}">
+      </td>
+
+      <!-- Second column: Name link -->
+      <td>
+        <a href="{% url 'record' record.id %}">
+          {{ record.first_name }} {{ record.last_name }}
+        </a>
+      </td>
+
+      <td>{{ record.gender }}</td>
+      <td>{{ record.national_id }}</td>
+      <td>{{ record.marital_status }}</td>
+      <td>{{ record.fullname_spouse }}</td>
+      <td>{{ record.email }}</td>
+      <td>{{ record.dob }}</td>
+      <td>{{ record.phone_main }}</td>
+      <td>{{ record.phone_optional }}</td>
+      <td>{{ record.address }}</td>
+      <td>{{ record.province }}</td>
+      <!--td>{{ record.creation_date }}</td-->
+      <td>
+        <a href="{% url 'record' record.id %}">{{ record.id }}</a>
+      </td>
     </tr>
-  {% endfor %}
-{% endif %}
-  </tbody>
-</table>
+    {% endfor %}
+  {% endif %}
+</tbody>
 
- 
+  </table>
 
-  {% else %}
+{% else %}
   <div class="col-md-6 offset-md-3">
     <h1>Login</h1>
     <br/>
@@ -55,8 +76,71 @@
       </div>
       <button type="submit" class="btn btn-secondary">Login</button>
     </form>
-  {% endif %}
+  </div>
+{% endif %}
 
-</div>
+{% endblock %}
 
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    var table = $('#recordsTable').DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            {
+                extend: 'print',
+                exportOptions: { columns: ':not(:first-child)' } // exclude checkbox col
+            },
+            {
+                extend: 'excelHtml5',
+                exportOptions: { columns: ':not(:first-child)' }
+            },
+            {
+                extend: 'pdfHtml5',
+                exportOptions: { columns: ':not(:first-child)' }
+            }
+        ],
+        pageLength: 10,
+        columnDefs: [
+            { orderable: false, targets: 0 } // disable ordering on checkbox column
+        ]
+    });
+
+    // Select/Deselect All
+    $('#selectAll').on('click', function(){
+        $('.record-checkbox').prop('checked', this.checked);
+    });
+
+    // Delete Selected
+    $('#deleteSelected').on('click', function(){
+        var ids = [];
+        $('.record-checkbox:checked').each(function(){
+            ids.push($(this).val());
+        });
+
+        if(ids.length === 0){
+            alert("Please select at least one record to delete.");
+            return;
+        }
+
+        if(confirm("Are you sure you want to delete selected records?")){
+            $.ajax({
+                url: "{% url 'delete_records' %}",
+                type: "POST",
+                data: {
+                    'ids[]': ids,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response){
+                    $('.record-checkbox:checked').each(function(){
+                        table.row($(this).closest('tr')).remove().draw();
+                    });
+                    alert(response.message);
+                }
+            });
+        }
+    });
+});
+</script>
 {% endblock %}

@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="{% url 'home' %}">Django CRM</a>
+    <a class="navbar-brand" href="{% url 'home' %}">CRM</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -10,6 +10,31 @@
         {% if user.is_authenticated %}
         <li class="nav-item">
           <a class="nav-link" href="{% url 'add_record' %}">Add Record</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Funds
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">Offerings</a></li>
+            <li><a class="dropdown-item" href="#">Tithes</a></li>
+            <li><a class="dropdown-item" href="#">Pledges</a></li>
+            <li><a class="dropdown-item" href="#">Fellowships</a></li>
+            <li><a class="dropdown-item" href="#">Funeral Contributions</a></li>
+            <li><a class="dropdown-item" href="#">Cell Groups</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Events
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">Provincial</a></li>
+            <li><a class="dropdown-item" href="#">Youth Conference</a></li>
+            <li><a class="dropdown-item" href="#">WISIMOs</a></li>
+            <li><a class="dropdown-item" href="#">AGM</a></li>
+            <li><a class="dropdown-item" href="#">Projects</a></li>
+          </ul>
         </li>
          <li class="nav-item">
           <a class="nav-link" href="{% url 'logout' %}">Logout</a>

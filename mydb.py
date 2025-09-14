@@ -16,7 +16,7 @@ conn = pymysql.connect(
 )
 
 cursorObject = conn.cursor()
-cursorObject.execute("CREATE DATABASE IF NOT EXISTS webs")
+cursorObject.execute("CREATE DATABASE IF NOT EXISTS mfa")
 print("All Done!")
 
 cursorObject.close()

@@ -1,7 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Record
+from .models import Record, AFM_PROVINCES
+
 
 
 class SignUpForm(UserCreationForm):
@@ -62,31 +63,37 @@ class SignUpForm(UserCreationForm):
 
 # Create Add Record Form
 class AddRecordForm(forms.ModelForm):
-    """docstring for AddRecordForm"""
+    # Display creation date as read-only
+    creation_date = forms.DateTimeField(
+        required=False,
+        widget=forms.DateTimeInput(attrs={
+            "class": "form-control",
+            "readonly": "readonly"
+        }),
+        label="Creation Date"
+    )
 
-    first_name = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"First Name", "class":"form-control"}), label="")
-    last_name = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Last Name", "class":"form-control"}), label="")
-    email = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Email", "class":"form-control"}), label="")
-    phone = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Phone", "class":"form-control"}), label="")
-    address = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Address", "class":"form-control"}), label="")
-    city = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"City", "class":"form-control"}), label="")
-    state = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"State", "class":"form-control"}), label="")
-    zipcode = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Zipcode", "class":"form-control"}), label="")
+    first_name = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder":"First Name", "class":"form-control"}), label="")
+    last_name = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder":"Last Name", "class":"form-control"}), label="")
+    gender = forms.ChoiceField(choices=[("Male", "Male"), ("Female", "Female")], widget=forms.Select(attrs={"class":"form-control"}), label="")
+    national_id = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder":"National ID", "class":"form-control"}), label="")
+    marital_status = forms.ChoiceField(choices=[("Single", "Single"), ("Married", "Married"), ("Divorced", "Divorced"), ("Widowed", "Widowed")], widget=forms.Select(attrs={"class":"form-control"}), label="")
+    fullname_spouse = forms.CharField(required=False, widget=forms.TextInput(attrs={"placeholder":"Full Name of Spouse", "class":"form-control"}), label="")
+    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={"placeholder":"Email", "class":"form-control"}), label="")
+    dob = forms.DateField(required=True, widget=forms.DateInput(attrs={"type":"date", "class":"form-control"}), label="")
+    phone_main = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder":"Phone", "class":"form-control"}), label="")
+    phone_optional = forms.CharField(required=False, widget=forms.TextInput(attrs={"placeholder":"Optional Phone", "class":"form-control"}), label="")
+    address = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder":"Address", "class":"form-control"}), label="")
+    province = forms.ChoiceField(choices=AFM_PROVINCES, widget=forms.Select(attrs={"class":"form-control"}), label="")
 
     class Meta:
         model = Record
-        exclude = ("user",)
+        exclude = ("user",)  # keep creation_date in the form as read-only, exclude it from user input
 
-    
-
-
-
-
-
-
-
-
-
-
-
+    def clean(self):
+        cleaned_data = super().clean()
+        marital_status = cleaned_data.get("marital_status")
+        fullname_spouse = cleaned_data.get("fullname_spouse")
         
+        if marital_status == "Married" and not fullname_spouse:
+            self.add_error("fullname_spouse", "This field is required for married individuals.")

@@ -6,19 +6,38 @@
     {{ customer_record.first_name }} {{ customer_record.last_name }}</strong>
   </div>
   <div class="card-body">
+
+    <p class="card-text">
+        <strong>Gender:</strong> {{ customer_record.gender }}</p>
+
+    <p class="card-text">
+        <strong>National_ID:</strong> {{ customer_record.national_id }}</p>
+
+    <p class="card-text">
+        <strong>Marital_Status:</strong> {{ customer_record.marital_status }}</p>
+
+    <p class="card-text">
+        <strong>Fullname_Spouse:</strong> {{ customer_record.fullname_spouse }}</p>
+
     <p class="card-text">
     	<strong>Email:</strong> {{ customer_record.email }}</p>
 
     <p class="card-text">
-        <strong>Phone:</strong> {{ customer_record.phone }}</p>
+        <strong>DOB:</strong> {{ customer_record.dob }}</p>
+
+    <p class="card-text">
+        <strong>Phone_Main:</strong> {{ customer_record.phone_main }}</p>
+    <p class="card-text">
+     <p class="card-text">
+        <strong>Phone_Optional:</strong> {{ customer_record.phone_optional }}</p>
     <p class="card-text">
         <strong>Address:</strong> {{ customer_record.address }}</p>
-    <p class="card-text">  
-        <strong>City:</strong> {{ customer_record.city }}</p>
+    <!--p class="card-text">  
+        <strong>City_Town_District:</strong> {{ customer_record.city_town_district }}</p-->
     <p class="card-text">
-        <strong>State:</strong> {{ customer_record.state }}</p>
-    <p class="card-text">
-        <strong>Created At:</strong> {{ customer_record.created_at }}</p>
+        <strong>Province:</strong> {{ customer_record.province }}</p>
+    <!--p class="card-text">
+        <strong>Creation_Date:</strong> {{ customer_record.creation_date }}</p-->
     <p class="card-text">
         <strong>ID:</strong> {{ customer_record.id }}
     </p>
